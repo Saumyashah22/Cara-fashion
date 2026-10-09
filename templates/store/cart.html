@@ -1,0 +1,239 @@
+{% extends "store/base.html" %}
+{% load static humanize %}
+
+{% block title %}Shopping Bag | Cara Fashion{% endblock %}
+
+{% block content %}
+<!-- Cart Page Header -->
+<section class="page-title-banner">
+  <div class="banner-content">
+    <span class="banner-tag">SECURE CHECKOUT</span>
+    <h1>Your Shopping Bag</h1>
+    <p>Review selected garments, apply promo vouchers, and place your order.</p>
+  </div>
+</section>
+
+<section class="cart-section section-p1">
+  <div class="section-container">
+    {% if items %}
+    <div class="cart-layout-grid">
+      <!-- Items Table Column -->
+      <div class="cart-items-column">
+        <div class="cart-items-card">
+          <div class="cart-card-header">
+            <h3>Items in Bag ({{ items|length }})</h3>
+            <a href="{% url 'shop' %}" class="continue-link"><i class="fa-solid fa-arrow-left"></i> Continue Shopping</a>
+          </div>
+
+          <div class="table-responsive">
+            <table class="cart-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Size</th>
+                  <th>Price</th>
+                  <th>Quantity</th>
+                  <th>Subtotal</th>
+                  <th>Remove</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in items %}
+                <tr>
+                  <td class="product-cell">
+                    <a href="{% url 'product' item.product.id %}" class="item-img-link">
+                      <img src="{% static item.product.image %}" alt="{{ item.product.name }}" class="cart-thumb" />
+                    </a>
+                    <div class="item-meta">
+                      <span class="item-brand">{{ item.product.brand }}</span>
+                      <a href="{% url 'product' item.product.id %}" class="item-name">{{ item.product.name }}</a>
+                    </div>
+                  </td>
+                  <td class="size-cell">
+                    <span class="cart-size-pill">{{ item.size }}</span>
+                  </td>
+                  <td class="price-cell">
+                    ₹{{ item.product.price|intcomma }}
+                  </td>
+                  <td class="qty-cell">
+                    <form method="post" action="{% url 'update_cart' item.id %}" class="qty-form">
+                      {% csrf_token %}
+                      <div class="cart-qty-stepper">
+                        <input
+                          type="number"
+                          name="quantity"
+                          value="{{ item.quantity }}"
+                          min="1"
+                          max="99"
+                          onchange="this.form.submit();"
+                          class="cart-qty-input"
+                        />
+                      </div>
+                    </form>
+                  </td>
+                  <td class="subtotal-cell">
+                    <strong>₹{{ item.subtotal|intcomma }}</strong>
+                  </td>
+                  <td class="remove-cell">
+                    <form method="post" action="{% url 'remove_from_cart' item.id %}">
+                      {% csrf_token %}
+                      <button type="submit" class="cart-remove-btn" title="Remove item">
+                        <i class="fa-regular fa-trash-can"></i>
+                        <span>Remove</span>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Coupon Card -->
+        <div class="coupon-box-card">
+          <div class="coupon-header">
+            <i class="fa-solid fa-ticket"></i>
+            <div>
+              <h4>Have a Promo Code?</h4>
+              <p>Apply code <strong>CARA10</strong> to receive an instant 10% discount on your order.</p>
+            </div>
+          </div>
+          <form method="get" action="{% url 'cart' %}" class="coupon-apply-form">
+            <input
+              type="text"
+              name="coupon"
+              placeholder="Enter coupon code (e.g. CARA10)"
+              value="{{ coupon|default:'' }}"
+              class="coupon-input"
+              required
+            />
+            <button type="submit" class="btn btn-secondary apply-btn">Apply Voucher</button>
+          </form>
+          {% if coupon_valid %}
+            <div class="coupon-success-tag">
+              <i class="fa-solid fa-circle-check"></i> 10% Discount Applied Successfully!
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Order Summary & Checkout Column -->
+      <div class="cart-summary-column">
+        <div class="summary-card">
+          <h3 class="summary-title">Order Summary</h3>
+
+          <div class="summary-breakdown">
+            <div class="summary-row">
+              <span>Bag Subtotal</span>
+              <span>₹{{ subtotal|intcomma }}</span>
+            </div>
+
+            {% if discount > 0 %}
+            <div class="summary-row discount-row">
+              <span>Coupon Discount (10%)</span>
+              <span>-₹{{ discount|intcomma }}</span>
+            </div>
+            {% endif %}
+
+            <div class="summary-row">
+              <span>Standard Shipping</span>
+              <span class="free-badge">FREE</span>
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-row total-row">
+              <span>Total Amount</span>
+              <span class="total-amount">₹{{ total|intcomma }}</span>
+            </div>
+          </div>
+
+          <!-- Checkout Form -->
+          <div class="checkout-box">
+            <h4 class="checkout-title"><i class="fa-solid fa-lock"></i> Delivery &amp; Contact Details</h4>
+            <form method="post" action="{% url 'checkout' %}" class="order-checkout-form">
+              {% csrf_token %}
+              <input type="hidden" name="coupon" value="{{ coupon }}" />
+
+              <div class="form-group">
+                <label for="id_customer_name">Full Name *</label>
+                <input
+                  type="text"
+                  id="id_customer_name"
+                  name="customer_name"
+                  placeholder="e.g. Saumya Shah"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="id_email">Email Address *</label>
+                <input
+                  type="email"
+                  id="id_email"
+                  name="email"
+                  placeholder="e.g. saumya@example.com"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="id_phone">Phone Number *</label>
+                <input
+                  type="tel"
+                  id="id_phone"
+                  name="phone"
+                  placeholder="e.g. +91 98765 43210"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="id_address">Delivery Address *</label>
+                <textarea
+                  id="id_address"
+                  name="address"
+                  rows="3"
+                  placeholder="Street address, apartment, city, and postal code..."
+                  required
+                ></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary checkout-submit-btn">
+                <i class="fa-solid fa-credit-card"></i>
+                <span>Continue to Payment (₹{{ total|intcomma }})</span>
+              </button>
+
+              <div class="security-guarantee">
+                <i class="fa-solid fa-lock"></i> Encrypted 256-Bit SSL Checkout • Free Returns
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <!-- Empty Cart State -->
+    <div class="empty-cart-container">
+      <div class="empty-cart-card">
+        <div class="empty-icon-circle">
+          <i class="fa-solid fa-bag-shopping"></i>
+        </div>
+        <h2>Your Shopping Bag is Empty</h2>
+        <p>Looks like you haven't added any luxury shirts or denim to your wardrobe yet.</p>
+        <div class="empty-actions">
+          <a href="{% url 'shop' %}" class="btn btn-primary">
+            <span>Discover The Shop</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+          <a href="{% url 'home' %}" class="btn btn-secondary">
+            <span>Back to Home</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

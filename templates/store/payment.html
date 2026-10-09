@@ -1,0 +1,103 @@
+{% extends "store/base.html" %}
+{% load static humanize %}
+
+{% block title %}Payment | Cara Fashion{% endblock %}
+
+{% block content %}
+<section class="page-title-banner">
+  <div class="banner-content">
+    <span class="banner-tag">FINAL STEP</span>
+    <h1>Payment &amp; Review</h1>
+    <p>Select a payment preference and confirm your order.</p>
+  </div>
+</section>
+
+<section class="payment-section section-p1">
+  <div class="section-container payment-layout">
+    <div class="payment-main-card">
+      <div class="payment-card-heading">
+        <span class="payment-heading-icon"><i class="fa-solid fa-location-dot"></i></span>
+        <div>
+          <h2>Delivery details</h2>
+          <p>Order will be delivered to this address.</p>
+        </div>
+      </div>
+      <div class="payment-delivery-details">
+        <strong>{{ details.customer_name }}</strong>
+        <span>{{ details.email }}</span>
+        <span>{{ details.phone }}</span>
+        <span>{{ details.address }}</span>
+      </div>
+
+      <div class="payment-card-heading payment-method-heading">
+        <span class="payment-heading-icon"><i class="fa-solid fa-wallet"></i></span>
+        <div>
+          <h2>Select payment method</h2>
+          <p>Choose how you plan to pay for this order.</p>
+        </div>
+      </div>
+
+      <form method="post" action="{% url 'payment' %}" class="payment-method-form">
+        {% csrf_token %}
+        {% for value, label in payment_methods %}
+        <label class="payment-method-option">
+          <input type="radio" name="payment_method" value="{{ value }}" {% if forloop.first %}checked{% endif %} />
+          <span class="payment-method-icon">
+            {% if value == "cod" %}
+              <i class="fa-solid fa-truck"></i>
+            {% elif value == "upi" %}
+              <i class="fa-solid fa-mobile-screen-button"></i>
+            {% else %}
+              <i class="fa-regular fa-credit-card"></i>
+            {% endif %}
+          </span>
+          <span class="payment-method-copy">
+            <strong>{{ label }}</strong>
+            <small>
+              {% if value == "cod" %}Pay when your order arrives.
+              {% elif value == "upi" %}UPI is recorded as your preferred payment method; no online payment is processed.
+              {% else %}Card is recorded as your preferred payment method; card details are not collected or charged.{% endif %}
+            </small>
+          </span>
+          <i class="fa-solid fa-circle-check payment-method-check"></i>
+        </label>
+        {% endfor %}
+
+        <p class="payment-info-note">
+          <i class="fa-solid fa-circle-info"></i>
+          This site records your payment preference only. UPI and card payments are not processed online.
+        </p>
+        <button type="submit" class="btn btn-primary payment-confirm-btn">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span>Place Order — ₹{{ total|intcomma }}</span>
+        </button>
+      </form>
+      <a class="payment-back-link" href="{% url 'cart' %}"><i class="fa-solid fa-arrow-left"></i> Back to cart</a>
+    </div>
+
+    <aside class="payment-summary-card">
+      <h2>Order summary</h2>
+      <div class="payment-items-list">
+        {% for item in items %}
+        <div class="payment-item">
+          <img src="{% static item.product.image %}" alt="{{ item.product.name }}" />
+          <div class="payment-item-info">
+            <strong>{{ item.product.name }}</strong>
+            <small>Size {{ item.size }} · Qty {{ item.quantity }}</small>
+          </div>
+          <span>₹{{ item.subtotal|intcomma }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="payment-total-lines">
+        <div><span>Subtotal</span><span>₹{{ subtotal|intcomma }}</span></div>
+        {% if discount %}
+        <div class="payment-discount-line"><span>Coupon discount</span><span>−₹{{ discount|intcomma }}</span></div>
+        {% endif %}
+        <div><span>Shipping</span><strong>Free</strong></div>
+        <div class="payment-grand-total"><strong>Total</strong><strong>₹{{ total|intcomma }}</strong></div>
+      </div>
+    </aside>
+  </div>
+</section>
+{% endblock %}

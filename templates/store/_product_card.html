@@ -1,0 +1,56 @@
+{% load static humanize %}
+<div class="product-card" onclick="window.location.href='{% url 'product' product.id %}';">
+  <div class="product-img-wrapper">
+    <img src="{% static product.image %}" alt="{{ product.name }}" loading="lazy" />
+    <div class="product-badges">
+      {% if product.featured %}
+        <span class="badge badge-featured">Featured</span>
+      {% elif product.new_arrival %}
+        <span class="badge badge-new">New Drop</span>
+      {% endif %}
+      <span class="badge badge-cat">{{ product.category }}</span>
+    </div>
+  </div>
+
+  <div class="product-info">
+    <div class="product-meta">
+      <span class="product-brand">{{ product.brand }}</span>
+      <div class="product-rating">
+        <i class="fa-solid fa-star"></i>
+        <span>5.0</span>
+      </div>
+    </div>
+
+    <h3 class="product-title" title="{{ product.name }}">{{ product.name }}</h3>
+
+    <div class="product-footer">
+      <div class="price-wrap">
+        <span class="price-currency">₹</span>
+        <span class="price-amount">{{ product.price|intcomma }}</span>
+      </div>
+
+      <div class="product-action-row">
+        <form class="wishlist-toggle-form" method="post" action="{% url 'toggle_wishlist' product.id %}" onclick="event.stopPropagation();">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.path }}" />
+          <button type="submit" class="wishlist-toggle-btn {% if product.id in wishlist_ids %}active{% endif %}" title="{% if product.id in wishlist_ids %}Remove from wishlist{% else %}Add to wishlist{% endif %}">
+            <i class="fa-solid fa-heart"></i>
+          </button>
+        </form>
+
+        <form class="card-cart-form" method="post" action="{% url 'add_to_cart' product.id %}" onclick="event.stopPropagation();">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.path }}" />
+          {% if request.resolver_match.url_name == "wishlist" %}
+            <input type="hidden" name="remove_from_wishlist" value="1" />
+          {% endif %}
+          <input type="hidden" name="size" value="M" />
+          <input type="hidden" name="quantity" value="1" />
+          <button type="submit" class="card-add-btn" title="Add to Bag">
+            <i class="fa-solid fa-cart-plus"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

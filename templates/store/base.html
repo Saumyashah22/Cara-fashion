@@ -1,0 +1,403 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Cara Fashion Shop — Discover luxury and everyday streetwear crafted with premium fabrics and modern aesthetics." />
+    <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}" />
+    <title>{% block title %}Cara Fashion | Modern Luxury & Streetwear{% endblock %}</title>
+
+    <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="{% static 'style.css' %}" />
+  </head>
+  <body>
+    <!-- Main Header -->
+    <header id="header" class="site-header">
+      <div class="header-container">
+        <!-- Logo -->
+        <a href="{% url 'home' %}" class="brand-logo" id="brand-logo">
+          <span class="logo-mark">C</span>
+          <div class="logo-text">
+            <span class="logo-name">CARA</span>
+            <span class="logo-tag">FASHION</span>
+          </div>
+        </a>
+
+        <!-- Global Product Search -->
+        <div class="header-search">
+          <form method="get" action="{% url 'shop' %}" class="search-form">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input
+              type="text"
+              name="q"
+              placeholder="Search shirts, jeans, jackets, brands..."
+              value="{{ search_query|default:'' }}"
+              id="header-search-input"
+            />
+            <button type="submit" class="search-submit" title="Search">Search</button>
+          </form>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="nav-wrapper">
+          <ul id="navbar" class="nav-links">
+            <li>
+              <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
+                Home
+              </a>
+            </li>
+            <li>
+              <a class="nav-link {% if request.resolver_match.url_name == 'shop' or request.resolver_match.url_name == 'product' %}active{% endif %}" href="{% url 'shop' %}">
+                Shop
+              </a>
+            </li>
+            <li>
+              <a class="nav-link {% if request.resolver_match.url_name == 'blog' %}active{% endif %}" href="{% url 'blog' %}">
+                Blog
+              </a>
+            </li>
+            <li>
+              <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'about' %}">
+                About
+              </a>
+            </li>
+            <li>
+              <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'contact' %}">
+                Contact
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- Header Actions: Auth, Cart & Mobile Toggle -->
+        <div class="header-actions">
+          <!-- Auth Buttons -->
+          {% if user.is_authenticated %}
+          <div class="user-menu" id="user-menu">
+            <button class="action-btn user-btn" id="user-menu-btn" title="My Account" aria-expanded="false">
+              <i class="fa-solid fa-circle-user"></i>
+              <span class="action-btn-text">{{ user.first_name|default:user.username }}</span>
+              <i class="fa-solid fa-chevron-down user-chevron"></i>
+            </button>
+            <div class="user-dropdown" id="user-dropdown">
+              <div class="user-dropdown-header">
+                <div class="user-avatar-lg"><i class="fa-solid fa-circle-user"></i></div>
+                <div>
+                  <strong>{{ user.get_full_name|default:user.username }}</strong>
+                  <small>{{ user.email }}</small>
+                </div>
+              </div>
+              <a href="{% url 'logout' %}" class="dropdown-item dropdown-logout">
+                <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+              </a>
+            </div>
+          </div>
+          {% else %}
+          <a href="{% url 'login' %}" class="action-btn login-btn" id="login-btn" title="Login">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span class="action-btn-text">Login</span>
+          </a>
+          <a href="{% url 'signup' %}" class="action-btn signup-nav-btn" id="signup-nav-btn" title="Create Account">
+            <i class="fa-solid fa-user-plus"></i>
+            <span class="action-btn-text">Sign Up</span>
+          </a>
+          {% endif %}
+
+          <a href="{% url 'wishlist' %}" class="action-btn wishlist-btn {% if request.resolver_match.url_name == 'wishlist' %}active{% endif %}" id="wishlist-btn" title="View Wishlist">
+            <i class="fa-solid fa-heart"></i>
+            <span class="action-btn-text">Wishlist</span>
+            {% if wishlist_count %}
+              <span class="cart-badge">{{ wishlist_count }}</span>
+            {% endif %}
+          </a>
+
+          <a href="{% url 'cart' %}" class="action-btn cart-btn {% if request.resolver_match.url_name == 'cart' %}active{% endif %}" id="cart-btn" title="View Cart">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span class="cart-label">Cart</span>
+            {% if cart_count %}
+              <span class="cart-badge">{{ cart_count }}</span>
+            {% endif %}
+          </a>
+
+          <!-- Mobile Hamburger Toggle -->
+          <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle Navigation Menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Drawer Navigation -->
+    <div class="mobile-drawer-overlay" id="mobile-overlay"></div>
+    <div class="mobile-drawer" id="mobile-drawer">
+      <div class="drawer-header">
+        <a href="{% url 'home' %}" class="brand-logo">
+          <span class="logo-mark">C</span>
+          <div class="logo-text">
+            <span class="logo-name">CARA</span>
+            <span class="logo-tag">FASHION</span>
+          </div>
+        </a>
+        <button class="drawer-close" id="drawer-close" aria-label="Close Menu">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Mobile Search -->
+      <form method="get" action="{% url 'shop' %}" class="mobile-search-form">
+        <input type="text" name="q" placeholder="Search products..." value="{{ search_query|default:'' }}" />
+        <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+      </form>
+
+      <ul class="mobile-nav-links">
+        <li><a class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Home</a></li>
+        <li><a class="{% if request.resolver_match.url_name == 'shop' or request.resolver_match.url_name == 'product' %}active{% endif %}" href="{% url 'shop' %}"><i class="fa-solid fa-bag-shopping"></i> Shop</a></li>
+        <li><a class="{% if request.resolver_match.url_name == 'blog' %}active{% endif %}" href="{% url 'blog' %}"><i class="fa-solid fa-newspaper"></i> Blog</a></li>
+        <li><a class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'about' %}"><i class="fa-solid fa-circle-info"></i> About</a></li>
+        <li><a class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'contact' %}"><i class="fa-solid fa-envelope"></i> Contact</a></li>
+        <li><a class="{% if request.resolver_match.url_name == 'wishlist' %}active{% endif %}" href="{% url 'wishlist' %}"><i class="fa-solid fa-heart"></i> Wishlist ({% if wishlist_count %}{{ wishlist_count }}{% else %}0{% endif %})</a></li>
+        <li><a class="{% if request.resolver_match.url_name == 'cart' %}active{% endif %}" href="{% url 'cart' %}"><i class="fa-solid fa-cart-shopping"></i> My Cart ({% if cart_count %}{{ cart_count }}{% else %}0{% endif %})</a></li>
+        {% if user.is_authenticated %}
+        <li class="mobile-auth-divider"><span>Signed in as <strong>{{ user.username }}</strong></span></li>
+        <li><a href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a></li>
+        {% else %}
+        <li><a class="{% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}"><i class="fa-solid fa-right-to-bracket"></i> Login</a></li>
+        <li><a class="mobile-signup-link {% if request.resolver_match.url_name == 'signup' %}active{% endif %}" href="{% url 'signup' %}"><i class="fa-solid fa-user-plus"></i> Sign Up</a></li>
+        {% endif %}
+      </ul>
+    </div>
+
+    <!-- Django Flash Messages -->
+    {% if messages %}
+    <div class="toast-container" id="toast-container">
+      {% for message in messages %}
+      <div class="toast-card toast-{{ message.tags }}">
+        <div class="toast-icon">
+          {% if 'success' in message.tags %}
+            <i class="fa-solid fa-circle-check"></i>
+          {% elif 'error' in message.tags %}
+            <i class="fa-solid fa-circle-exclamation"></i>
+          {% else %}
+            <i class="fa-solid fa-circle-info"></i>
+          {% endif %}
+        </div>
+        <div class="toast-message">{{ message }}</div>
+        <button class="toast-close" onclick="this.parentElement.remove();">&times;</button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Page Content -->
+    <main class="main-content">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- Newsletter Section -->
+    <section id="newsletter" class="newsletter-section">
+      <div class="newsletter-container">
+        <div class="newsletter-text">
+          <span class="newsletter-badge">STAY IN THE LOOP</span>
+          <h3>Join The Cara Insiders Club</h3>
+          <p>Get exclusive early access to drops, secret discount codes, and fashion trends delivered straight to your inbox.</p>
+        </div>
+        <form class="newsletter-form" method="post" action="{% url 'newsletter' %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.path }}" />
+          <div class="newsletter-input-group">
+            <i class="fa-regular fa-envelope"></i>
+            <input type="email" name="email" placeholder="Enter your email address..." required id="newsletter-email" />
+            <button class="btn btn-primary" type="submit" id="newsletter-btn">Subscribe <i class="fa-solid fa-arrow-right"></i></button>
+          </div>
+          <span class="newsletter-subtext"><i class="fa-solid fa-lock"></i> We respect your privacy. No spam ever.</span>
+        </form>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-container">
+        <div class="footer-col brand-col">
+          <a href="{% url 'home' %}" class="brand-logo footer-logo">
+            <span class="logo-mark">C</span>
+            <div class="logo-text">
+              <span class="logo-name">CARA</span>
+              <span class="logo-tag">FASHION</span>
+            </div>
+          </a>
+          <p class="brand-desc">
+            Curating state-of-the-art contemporary streetwear and classic fashion essentials with unrivaled craftsmanship.
+          </p>
+          <div class="contact-info">
+            <div class="contact-item">
+              <i class="fa-solid fa-location-dot"></i>
+              <span>345 Sterling Road, Ashram Rd, Ahmedabad, Gujarat</span>
+            </div>
+            <div class="contact-item">
+              <i class="fa-solid fa-phone"></i>
+              <span>+91 01 2345 6789 / +01 2222 365</span>
+            </div>
+            <div class="contact-item">
+              <i class="fa-solid fa-clock"></i>
+              <span>Mon - Sat: 9:00 AM - 7:00 PM</span>
+            </div>
+          </div>
+          <div class="social-links">
+            <a href="#" class="social-icon" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" class="social-icon" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" class="social-icon" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="#" class="social-icon" aria-label="Pinterest"><i class="fa-brands fa-pinterest-p"></i></a>
+            <a href="#" class="social-icon" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-heading">Shop Categories</h4>
+          <ul class="footer-links">
+            <li><a href="{% url 'shop' %}?category=Shirt">Men's Shirts</a></li>
+            <li><a href="{% url 'shop' %}?category=Jeans">Denim &amp; Cargo Jeans</a></li>
+            <li><a href="{% url 'shop' %}?category=Jacket">Luxury Wool Jackets</a></li>
+            <li><a href="{% url 'shop' %}?category=T-Shirt">Designer T-Shirts</a></li>
+            <li><a href="{% url 'shop' %}">All Collections</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-heading">Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="{% url 'about' %}">About Our Brand</a></li>
+            <li><a href="{% url 'blog' %}">Fashion Journal</a></li>
+            <li><a href="{% url 'contact' %}">Contact &amp; Support</a></li>
+            <li><a href="{% url 'cart' %}">Cart &amp; Checkout</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col app-col">
+          <h4 class="footer-heading">Mobile Experience</h4>
+          <p>Get the Cara app on iOS and Android for exclusive member perks and early sale access.</p>
+          <div class="app-badges">
+            <div class="app-badge">
+              <i class="fa-brands fa-apple"></i>
+              <div>
+                <small>Download on the</small>
+                <strong>App Store</strong>
+              </div>
+            </div>
+            <div class="app-badge">
+              <i class="fa-brands fa-google-play"></i>
+              <div>
+                <small>GET IT ON</small>
+                <strong>Google Play</strong>
+              </div>
+            </div>
+          </div>
+          <h4 class="footer-heading payment-title">Secured Checkout</h4>
+          <div class="payment-methods">
+            <span class="pay-tag"><i class="fa-brands fa-cc-visa"></i> Visa</span>
+            <span class="pay-tag"><i class="fa-brands fa-cc-mastercard"></i> MasterCard</span>
+            <span class="pay-tag"><i class="fa-brands fa-cc-apple-pay"></i> Apple Pay</span>
+            <span class="pay-tag"><i class="fa-solid fa-shield-halved"></i> 256-Bit SSL</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="footer-bottom-container">
+          <p class="copyright-text">
+            &copy; 2026 <strong>CARA FASHION</strong>. Designed &amp; Crafted by Saumya Shah. All rights reserved.
+          </p>
+          <div class="bottom-links">
+            <a href="{% url 'about' %}">Privacy Policy</a>
+            <span>•</span>
+            <a href="{% url 'about' %}">Terms of Service</a>
+            <span>•</span>
+            <a href="{% url 'contact' %}">Help Center</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Interactive UI Scripts -->
+    <script>
+      // Mobile Drawer Toggle
+      const mobileToggle = document.getElementById('mobile-toggle');
+      const drawerClose = document.getElementById('drawer-close');
+      const mobileDrawer = document.getElementById('mobile-drawer');
+      const mobileOverlay = document.getElementById('mobile-overlay');
+
+      function openDrawer() {
+        if (mobileDrawer && mobileOverlay) {
+          mobileDrawer.classList.add('open');
+          mobileOverlay.classList.add('open');
+          document.body.style.overflow = 'hidden';
+        }
+      }
+
+      function closeDrawer() {
+        if (mobileDrawer && mobileOverlay) {
+          mobileDrawer.classList.remove('open');
+          mobileOverlay.classList.remove('open');
+          document.body.style.overflow = '';
+        }
+      }
+
+      if (mobileToggle) mobileToggle.addEventListener('click', openDrawer);
+      if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+      if (mobileOverlay) mobileOverlay.addEventListener('click', closeDrawer);
+
+      // Auto dismiss toast alerts after 4.5 seconds
+      const toastContainer = document.getElementById('toast-container');
+      if (toastContainer) {
+        setTimeout(() => {
+          const toasts = toastContainer.querySelectorAll('.toast-card');
+          toasts.forEach((toast) => {
+            toast.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-10px)';
+            setTimeout(() => toast.remove(), 500);
+          });
+        }, 4500);
+      }
+
+      // Sticky header elevation on scroll
+      const siteHeader = document.getElementById('header');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 30) {
+          siteHeader.classList.add('scrolled');
+        } else {
+          siteHeader.classList.remove('scrolled');
+        }
+      });
+
+      // User dropdown menu toggle
+      const userMenuBtn = document.getElementById('user-menu-btn');
+      const userDropdown = document.getElementById('user-dropdown');
+      if (userMenuBtn && userDropdown) {
+        userMenuBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpen = userDropdown.classList.toggle('open');
+          userMenuBtn.setAttribute('aria-expanded', isOpen);
+        });
+        document.addEventListener('click', () => {
+          userDropdown.classList.remove('open');
+          userMenuBtn.setAttribute('aria-expanded', 'false');
+        });
+      }
+    </script>
+  </body>
+</html>

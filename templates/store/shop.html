@@ -1,0 +1,118 @@
+{% extends "store/base.html" %}
+{% load static %}
+
+{% block title %}Shop Collection | Cara Fashion{% endblock %}
+
+{% block content %}
+<!-- Shop Hero Banner -->
+<section class="shop-hero-banner">
+  <div class="shop-hero-content">
+    <span class="shop-badge">THE CARA WARDROBE</span>
+    <h1>Explore The Catalogue</h1>
+    <p>Discover luxury tailoring, everyday printed shirts, and street denim crafted for comfort.</p>
+  </div>
+</section>
+
+<!-- Filter & Toolbar Section -->
+<section class="shop-filter-section">
+  <div class="section-container">
+    <div class="shop-toolbar-card">
+      <!-- Category Filter Pills -->
+      <div class="category-pills">
+        <a href="{% url 'shop' %}{% if search_query %}?q={{ search_query }}{% endif %}" class="pill {% if not current_category %}active{% endif %}">
+          All Products
+        </a>
+        {% for cat in categories %}
+          <a href="{% url 'shop' %}?category={{ cat }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}" class="pill {% if current_category == cat %}active{% endif %}">
+            {{ cat }}s
+          </a>
+        {% endfor %}
+      </div>
+
+      <!-- Controls: Search & Sort -->
+      <form method="get" action="{% url 'shop' %}" class="shop-controls-form" id="shop-controls-form">
+        {% if current_category %}
+          <input type="hidden" name="category" value="{{ current_category }}" />
+        {% endif %}
+
+        <div class="search-input-wrapper">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input
+            type="text"
+            name="q"
+            placeholder="Filter by keyword..."
+            value="{{ search_query }}"
+            class="filter-search-input"
+          />
+          {% if search_query %}
+            <a href="{% url 'shop' %}{% if current_category %}?category={{ current_category }}{% endif %}" class="clear-search" title="Clear search">&times;</a>
+          {% endif %}
+        </div>
+
+        <div class="sort-select-wrapper">
+          <label for="sort-select">Sort by:</label>
+          <select name="sort" id="sort-select" onchange="document.getElementById('shop-controls-form').submit();">
+            <option value="" {% if not current_sort %}selected{% endif %}>Default Order</option>
+            <option value="price_asc" {% if current_sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_desc" {% if current_sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+            <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest First</option>
+          </select>
+        </div>
+      </form>
+    </div>
+
+    <!-- Results Count Bar -->
+    <div class="results-meta-bar">
+      <span>
+        Showing <strong>{{ page.object_list|length }}</strong> of <strong>{{ total_count }}</strong> products
+        {% if current_category %} in <em>{{ current_category }}s</em>{% endif %}
+        {% if search_query %} matching "<em>{{ search_query }}</em>"{% endif %}
+      </span>
+      {% if current_category or search_query or current_sort %}
+        <a href="{% url 'shop' %}" class="reset-filters-link"><i class="fa-solid fa-rotate-left"></i> Reset all filters</a>
+      {% endif %}
+    </div>
+
+    <!-- Products Grid -->
+    <div class="product-grid">
+      {% for product in page %}
+        {% include "store/_product_card.html" %}
+      {% empty %}
+        <div class="no-results-box">
+          <div class="no-results-icon"><i class="fa-solid fa-bag-shopping"></i></div>
+          <h3>No products match your criteria</h3>
+          <p>Try adjusting your search terms or selecting a different category from above.</p>
+          <a href="{% url 'shop' %}" class="btn btn-primary">Browse All Products</a>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page.has_other_pages %}
+    <div class="pagination-wrapper">
+      <div class="pagination-controls">
+        {% if page.has_previous %}
+          <a href="?page={{ page.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}" class="page-nav prev-page" title="Previous page">
+            <i class="fa-solid fa-chevron-left"></i> Previous
+          </a>
+        {% endif %}
+
+        {% for num in page.paginator.page_range %}
+          {% if page.number == num %}
+            <span class="page-num active">{{ num }}</span>
+          {% else %}
+            <a href="?page={{ num }}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}" class="page-num">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if page.has_next %}
+          <a href="?page={{ page.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}" class="page-nav next-page" title="Next page">
+            Next <i class="fa-solid fa-chevron-right"></i>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

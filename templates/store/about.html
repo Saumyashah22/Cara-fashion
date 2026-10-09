@@ -1,0 +1,111 @@
+{% extends "store/base.html" %}
+{% load static %}
+
+{% block title %}About Us | Cara Fashion{% endblock %}
+
+{% block content %}
+<!-- About Banner -->
+<section class="about-hero-banner">
+  <div class="banner-content">
+    <span class="banner-tag">OUR JOURNEY</span>
+    <h1>The Story Behind Cara</h1>
+    <p>Crafting accessible luxury, timeless streetwear silhouettes, and conscious fashion.</p>
+  </div>
+</section>
+
+<!-- About Story Section -->
+<section class="about-story-section section-p1">
+  <div class="section-container">
+    <div class="about-story-grid">
+      <div class="about-story-image">
+        <img src="{% static 'img/about/img/img1.jpg' %}" alt="Cara Design Studio" class="story-img" />
+        <div class="image-floating-badge">
+          <strong>Est. 2024</strong>
+          <span>Crafted in Ahmedabad</span>
+        </div>
+      </div>
+
+      <div class="about-story-content">
+        <span class="sub-heading">WHO WE ARE</span>
+        <h2>Fashion Reimagined with Purpose &amp; Precision</h2>
+        <p>
+          Born from a passion for contemporary tailoring and sustainable craftsmanship, <strong>Cara Fashion</strong> is dedicated to delivering statement clothing that effortlessly bridges the gap between daily comfort and luxury aesthetics.
+        </p>
+        <p>
+          Every piece in our collection—from breathable linen and printed cotton shirts to hand-finished cargo denim and Italian-inspired wool blousons—is curated to stand the test of time and elevate your everyday wardrobe.
+        </p>
+
+        <!-- Brand Values Pills -->
+        <div class="values-checklist">
+          <div class="value-item">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Ethically sourced fabrics &amp; fair artisanal wages</span>
+          </div>
+          <div class="value-item">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Strict multi-point quality inspection on every garment</span>
+          </div>
+          <div class="value-item">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Seamless Django-powered shopping &amp; real-time fulfillment</span>
+          </div>
+        </div>
+
+        <div class="story-cta">
+          <a href="{% url 'shop' %}" class="btn btn-primary">
+            <span>Explore The Collection</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Counter Section -->
+<section class="about-stats-section section-p1">
+  <div class="section-container">
+    <div class="stats-counter-grid">
+      <div class="stat-card">
+        <h3>50,000+</h3>
+        <p>Happy Shoppers Worldwide</p>
+      </div>
+      <div class="stat-card">
+        <h3>100%</h3>
+        <p>Pure Cotton &amp; Cashmere Blends</p>
+      </div>
+      <div class="stat-card">
+        <h3>4.9 / 5</h3>
+        <p>Average Customer Review Score</p>
+      </div>
+      <div class="stat-card">
+        <h3>24 Hours</h3>
+        <p>Fast Dispatch Window</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Brand Video / App Showcase Section -->
+<section class="about-app-section section-p1">
+  <div class="section-container">
+    <div class="app-showcase-card">
+      <div class="app-showcase-text">
+        <span class="app-badge">ON-THE-GO STYLING</span>
+        <h2>Download The Cara Mobile App</h2>
+        <p>Get instant notifications for limited flash drops, track your packages in real-time, and unlock app-only VIP discounts.</p>
+        <div class="app-buttons">
+          <a href="#" class="btn btn-primary"><i class="fa-brands fa-apple"></i> Apple App Store</a>
+          <a href="#" class="btn btn-secondary"><i class="fa-brands fa-google-play"></i> Google Play</a>
+        </div>
+      </div>
+
+      <div class="app-video-wrapper">
+        <video autoplay muted loop playsinline class="app-video">
+          <source src="{% static 'img/about/videos/video1.mp4' %}" type="video/mp4" />
+        </video>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

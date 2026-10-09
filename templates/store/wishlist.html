@@ -1,0 +1,40 @@
+{% extends "store/base.html" %}
+{% load static %}
+
+{% block title %}My Wishlist | Cara Fashion{% endblock %}
+
+{% block content %}
+<section class="page-title-banner">
+  <div class="banner-content">
+    <span class="banner-tag">YOUR SAVED STYLE</span>
+    <h1>My Wishlist</h1>
+    <p>Keep track of your favorite looks, upcoming drops, and pieces you want to revisit.</p>
+  </div>
+</section>
+
+<section class="wishlist-section section-p1">
+  <div class="section-container">
+    {% if products %}
+      <div class="wishlist-toolbar">
+        <div>
+          <strong>{{ count }}</strong> item{{ count|pluralize }} saved
+        </div>
+        <a href="{% url 'shop' %}" class="btn btn-secondary">Continue Shopping</a>
+      </div>
+
+      <div class="product-grid wishlist-grid">
+        {% for product in products %}
+          {% include "store/_product_card.html" %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state-box">
+        <div class="empty-state-icon"><i class="fa-solid fa-heart-circle-xmark"></i></div>
+        <h3>Your wishlist is empty</h3>
+        <p>Add your favorite pieces to save them for later.</p>
+        <a href="{% url 'shop' %}" class="btn btn-primary">Explore products</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

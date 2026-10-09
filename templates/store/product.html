@@ -1,0 +1,277 @@
+{% extends "store/base.html" %}
+{% load static humanize %}
+
+{% block title %}{{ product.name }} | Cara Fashion{% endblock %}
+
+{% block content %}
+<!-- Product Detail View -->
+<section class="product-detail-section section-p1">
+  <div class="section-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-nav">
+      <a href="{% url 'home' %}">Home</a>
+      <i class="fa-solid fa-chevron-right"></i>
+      <a href="{% url 'shop' %}">Shop</a>
+      <i class="fa-solid fa-chevron-right"></i>
+      <a href="{% url 'shop' %}?category={{ product.category }}">{{ product.category }}</a>
+      <i class="fa-solid fa-chevron-right"></i>
+      <span class="active">{{ product.name }}</span>
+    </nav>
+
+    <div class="product-detail-grid">
+      <!-- Media Gallery -->
+      <div class="product-gallery">
+        <div class="main-image-wrapper">
+          <img
+            src="{% static product.image %}"
+            id="MainImg"
+            alt="{{ product.name }}"
+            class="main-product-img"
+          />
+          <span class="gallery-badge">{{ product.category }}</span>
+        </div>
+
+        {% if related %}
+        <div class="thumbnail-strip">
+          <div class="thumb-item active" onclick="swapImage(this, '{% static product.image %}')">
+            <img src="{% static product.image %}" alt="{{ product.name }}" />
+          </div>
+          {% for item in related %}
+          <div class="thumb-item" onclick="swapImage(this, '{% static item.image %}')">
+            <img src="{% static item.image %}" alt="{{ item.name }}" />
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Details & Actions -->
+      <div class="product-summary">
+        <div class="brand-pill-wrap">
+          <span class="brand-pill">{{ product.brand }}</span>
+          <span class="stock-badge"><i class="fa-solid fa-check"></i> In Stock</span>
+        </div>
+
+        <h1 class="detail-title">{{ product.name }}</h1>
+
+        <div class="detail-rating">
+          <div class="stars">
+            {% if average_rating %}
+              {% for star in "12345" %}
+                <i class="fa-{% if forloop.counter <= average_rating %}solid{% else %}regular{% endif %} fa-star"></i>
+              {% endfor %}
+            {% else %}
+              {% for star in "12345" %}<i class="fa-regular fa-star"></i>{% endfor %}
+            {% endif %}
+          </div>
+          <span class="rating-text">
+            {% if average_rating %}{{ average_rating|floatformat:1 }}{% else %}No ratings yet{% endif %}
+            · {{ review_count }} review{{ review_count|pluralize }}
+          </span>
+        </div>
+
+        <div class="detail-price-box">
+          <span class="price-symbol">₹</span>
+          <span class="price-val">{{ product.price|intcomma }}</span>
+          <span class="price-tax">Includes all local taxes</span>
+        </div>
+
+        <div class="detail-desc">
+          <h4>About This Piece</h4>
+          <p>{{ product.description }}</p>
+        </div>
+
+        <!-- Add to Cart Form -->
+        <form method="post" action="{% url 'add_to_cart' product.id %}" class="detail-cart-form">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{% url 'cart' %}" />
+
+          <!-- Size Selector Pills -->
+          <div class="size-selector-wrap">
+            <div class="size-label-row">
+              <label>Select Size</label>
+              <a href="javascript:void(0)" class="size-guide-link" onclick="alert('Standard International Men\'s Sizing. Relaxed / True-to-size fit.');">
+                <i class="fa-solid fa-ruler-horizontal"></i> Size Guide
+              </a>
+            </div>
+            <div class="size-buttons">
+              <label class="size-pill-label">
+                <input type="radio" name="size" value="S" />
+                <span class="size-pill">S</span>
+              </label>
+              <label class="size-pill-label">
+                <input type="radio" name="size" value="M" checked />
+                <span class="size-pill">M</span>
+              </label>
+              <label class="size-pill-label">
+                <input type="radio" name="size" value="L" />
+                <span class="size-pill">L</span>
+              </label>
+              <label class="size-pill-label">
+                <input type="radio" name="size" value="XL" />
+                <span class="size-pill">XL</span>
+              </label>
+              <label class="size-pill-label">
+                <input type="radio" name="size" value="XXL" />
+                <span class="size-pill">XXL</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Quantity Stepper & Add to Bag -->
+          <div class="purchase-row">
+            <div class="quantity-stepper">
+              <button type="button" class="stepper-btn" onclick="stepQty(-1)"><i class="fa-solid fa-minus"></i></button>
+              <input type="number" name="quantity" id="product-qty" value="1" min="1" max="99" />
+              <button type="button" class="stepper-btn" onclick="stepQty(1)"><i class="fa-solid fa-plus"></i></button>
+            </div>
+
+            <button type="submit" class="btn btn-primary add-bag-btn">
+              <i class="fa-solid fa-bag-shopping"></i>
+              <span>Add To Shopping Bag</span>
+            </button>
+          </div>
+        </form>
+
+        <form method="post" action="{% url 'toggle_wishlist' product.id %}" class="detail-wishlist-form">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.path }}" />
+          <button
+            type="submit"
+            class="btn btn-secondary detail-wishlist-btn {% if product.id in wishlist_ids %}active{% endif %}"
+            aria-pressed="{% if product.id in wishlist_ids %}true{% else %}false{% endif %}"
+          >
+            <i class="fa-solid fa-heart"></i>
+            {% if product.id in wishlist_ids %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}
+          </button>
+        </form>
+
+        <!-- Trust Badges -->
+        <div class="trust-features-list">
+          <div class="trust-feat-item">
+            <i class="fa-solid fa-truck-fast"></i>
+            <div>
+              <strong>Fast Express Delivery</strong>
+              <p>Dispatched in 24 hours with trackable logistics</p>
+            </div>
+          </div>
+          <div class="trust-feat-item">
+            <i class="fa-solid fa-rotate-left"></i>
+            <div>
+              <strong>30 Days Return Policy</strong>
+              <p>Complimentary returns if you are not fully satisfied</p>
+            </div>
+          </div>
+          <div class="trust-feat-item">
+            <i class="fa-solid fa-shield-check"></i>
+            <div>
+              <strong>Authenticity Guarantee</strong>
+              <p>Directly sourced verified designer apparel</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="customer-reviews-section section-p1" id="reviews">
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-badge">CUSTOMER FEEDBACK</div>
+      <h2 class="section-title">Customer Reviews</h2>
+      <p class="section-subtitle">
+        {% if average_rating %}
+          Rated {{ average_rating|floatformat:1 }} out of 5 by {{ review_count }} customer{{ review_count|pluralize }}.
+        {% else %}
+          Be the first to share your experience with this product.
+        {% endif %}
+      </p>
+    </div>
+
+    <div class="reviews-layout">
+      <div class="review-list">
+        {% for review in reviews %}
+          <article class="review-card">
+            <div class="review-card-header">
+              <div>
+                <strong>{{ review.user.get_username }}</strong>
+                <span class="review-date">{{ review.created_at|date:"M j, Y" }}</span>
+              </div>
+              <span class="review-stars" aria-label="{{ review.rating }} out of 5 stars">
+                {% for star in "12345" %}
+                  <i class="fa-{% if forloop.counter <= review.rating %}solid{% else %}regular{% endif %} fa-star"></i>
+                {% endfor %}
+                <span>{{ review.rating }}/5</span>
+              </span>
+            </div>
+            <p>{{ review.body|linebreaksbr }}</p>
+          </article>
+        {% empty %}
+          <div class="reviews-empty">
+            <i class="fa-regular fa-comment-dots"></i>
+            <p>No reviews yet. Your feedback can help other customers.</p>
+          </div>
+        {% endfor %}
+      </div>
+
+      <form method="post" action="{% url 'submit_review' product.id %}" class="review-form">
+        {% csrf_token %}
+        <h3>{% if user_review %}Update your review{% else %}Write a review{% endif %}</h3>
+        <label for="{{ review_form.rating.id_for_label }}">{{ review_form.rating.label }}</label>
+        {{ review_form.rating }}
+        {{ review_form.rating.errors }}
+        <label for="{{ review_form.body.id_for_label }}">{{ review_form.body.label }}</label>
+        {{ review_form.body }}
+        {{ review_form.body.errors }}
+        <button type="submit" class="btn btn-primary">
+          {% if user_review %}Update Review{% else %}Submit Review{% endif %}
+        </button>
+        <small>You can submit one review per product and update it any time.</small>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Related Products Showcase -->
+<section class="products-section related-section section-p1">
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-badge">YOU MAY ALSO LIKE</div>
+      <h2 class="section-title">Similar Styles</h2>
+      <p class="section-subtitle">Customers who viewed this item also loved these pieces</p>
+    </div>
+
+    <div class="product-grid">
+      {% for product in related %}
+        {% include "store/_product_card.html" %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Image Swap & Stepper Script -->
+<script>
+  function swapImage(thumbElem, newSrc) {
+    const mainImg = document.getElementById('MainImg');
+    if (mainImg) {
+      mainImg.style.opacity = '0.3';
+      setTimeout(() => {
+        mainImg.src = newSrc;
+        mainImg.style.opacity = '1';
+      }, 150);
+    }
+    document.querySelectorAll('.thumb-item').forEach(el => el.classList.remove('active'));
+    thumbElem.classList.add('active');
+  }
+
+  function stepQty(change) {
+    const qtyInput = document.getElementById('product-qty');
+    if (qtyInput) {
+      let current = parseInt(qtyInput.value) || 1;
+      current = Math.max(1, current + change);
+      qtyInput.value = current;
+    }
+  }
+</script>
+{% endblock %}

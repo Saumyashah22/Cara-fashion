@@ -1,0 +1,221 @@
+{% extends "store/base.html" %}
+{% load static %}
+
+{% block title %}Cara Fashion | Luxury Streetwear & Modern Apparel{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section" id="hero">
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="pulse-dot"></span>
+      <span>AUTUMN / WINTER 2026 COLLECTION</span>
+    </div>
+    <h1 class="hero-title">
+      Redefine Your Style.<br />
+      <span class="gradient-text">Pure Modern Luxury.</span>
+    </h1>
+    <p class="hero-subtitle">
+      Explore hand-selected shirts, bespoke denim, and designer outerwear tailored for effortless elegance and comfort.
+    </p>
+    <div class="hero-actions">
+      <a href="{% url 'shop' %}" class="btn btn-primary hero-btn">
+        <span>Shop The Collection</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </a>
+      <a href="{% url 'shop' %}?category=Shirt" class="btn btn-secondary hero-btn">
+        <span>Explore Shirts</span>
+      </a>
+    </div>
+
+    <!-- Hero Stats / Social Proof -->
+    <div class="hero-stats">
+      <div class="stat-item">
+        <strong>15K+</strong>
+        <span>Happy Clients</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <strong>4.9/5</strong>
+        <span>Customer Rating</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <strong>100%</strong>
+        <span>Authentic Brands</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Value Features Section -->
+<section class="features-section section-p1">
+  <div class="section-container">
+    <div class="features-grid">
+      <div class="fe-card">
+        <div class="fe-icon-wrap icon-blue">
+          <i class="fa-solid fa-truck-fast"></i>
+        </div>
+        <h4>Free Global Shipping</h4>
+        <p>Complimentary express shipping on every order worldwide.</p>
+      </div>
+
+      <div class="fe-card">
+        <div class="fe-icon-wrap icon-purple">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <h4>Instant Dispatch</h4>
+        <p>Orders are packaged and dispatched within 24 hours of checkout.</p>
+      </div>
+
+      <div class="fe-card">
+        <div class="fe-icon-wrap icon-green">
+          <i class="fa-solid fa-tags"></i>
+        </div>
+        <h4>Member Discounts</h4>
+        <p>Enjoy up to 75% off seasonal collections with code <strong>CARA10</strong>.</p>
+      </div>
+
+      <div class="fe-card">
+        <div class="fe-icon-wrap icon-amber">
+          <i class="fa-solid fa-award"></i>
+        </div>
+        <h4>Premium Materials</h4>
+        <p>100% pure Egyptian cotton, cashmere blends, and selvedge denim.</p>
+      </div>
+
+      <div class="fe-card">
+        <div class="fe-icon-wrap icon-rose">
+          <i class="fa-solid fa-shield-heart"></i>
+        </div>
+        <h4>30-Day Easy Returns</h4>
+        <p>Hassle-free exchanges and complete money-back guarantee.</p>
+      </div>
+
+      <div class="fe-card">
+        <div class="fe-icon-wrap icon-teal">
+          <i class="fa-solid fa-headset"></i>
+        </div>
+        <h4>24/7 VIP Support</h4>
+        <p>Dedicated fashion concierges ready to assist your style queries.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Products Section -->
+<section class="products-section section-p1">
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-badge">CURATED SELECTION</div>
+      <h2 class="section-title">Featured Highlights</h2>
+      <p class="section-subtitle">Summer &amp; Autumn essential shirts and denim crafted for modern living</p>
+    </div>
+
+    <div class="product-grid">
+      {% for product in featured %}
+        {% include "store/_product_card.html" %}
+      {% empty %}
+        <p class="empty-text">No featured products found.</p>
+      {% endfor %}
+    </div>
+
+    <div class="section-cta">
+      <a href="{% url 'shop' %}" class="btn btn-outline">
+        <span>View Full Catalogue</span>
+        <i class="fa-solid fa-chevron-right"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Promotional Banner -->
+<section class="promo-banner-section section-m1">
+  <div class="promo-banner-inner">
+    <span class="promo-tag">FLASH OFFER</span>
+    <h2>Seasonal Clearance Sale</h2>
+    <p>Enjoy up to <span class="highlight-text">75% OFF</span> all designer accessories, shirts, and jeans.</p>
+    <a href="{% url 'shop' %}" class="btn btn-glow">
+      <span>Explore Deals Now</span>
+      <i class="fa-solid fa-arrow-trend-up"></i>
+    </a>
+  </div>
+</section>
+
+<!-- New Arrivals Section -->
+<section class="products-section section-p1">
+  <div class="section-container">
+    <div class="section-header">
+      <div class="section-badge">FRESH ON THE RACK</div>
+      <h2 class="section-title">New Arrivals</h2>
+      <p class="section-subtitle">Luxury mainline drops from Versace, Canali, Kenzo, and Armani</p>
+    </div>
+
+    <div class="product-grid">
+      {% for product in new_arrivals %}
+        {% include "store/_product_card.html" %}
+      {% empty %}
+        <p class="empty-text">No new arrivals available currently.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Split Promo Grid -->
+<section class="split-promo-section section-p1">
+  <div class="section-container">
+    <div class="split-promo-grid">
+      <div class="split-promo-card card-deal1">
+        <div class="card-overlay"></div>
+        <div class="card-content">
+          <span class="sub-heading">SPECIAL PROMO</span>
+          <h3>Buy 1 Get 1 Free</h3>
+          <p>On select classic shirts and street graphic tees this weekend.</p>
+          <a href="{% url 'shop' %}?category=Shirt" class="btn btn-glass">Shop Shirts</a>
+        </div>
+      </div>
+
+      <div class="split-promo-card card-deal2">
+        <div class="card-overlay"></div>
+        <div class="card-content">
+          <span class="sub-heading">TRENDING NOW</span>
+          <h3>Spring / Summer '26</h3>
+          <p>Lightweight breathable fabrics engineered for effortless summer fits.</p>
+          <a href="{% url 'shop' %}?category=Jeans" class="btn btn-glass">Explore Denim</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Triple Mini Banner Grid -->
+<section class="mini-banners-section section-p1">
+  <div class="section-container">
+    <div class="mini-banners-grid">
+      <div class="mini-banner-card mini-card1">
+        <div class="mini-content">
+          <h4>SEASONAL SALE</h4>
+          <h3>Winter Cashmere - 60% OFF</h3>
+          <a href="{% url 'shop' %}?category=Jacket" class="mini-link">Browse Jackets &rarr;</a>
+        </div>
+      </div>
+
+      <div class="mini-banner-card mini-card2">
+        <div class="mini-content">
+          <h4>NEW FOOTWEAR &amp; DENIM</h4>
+          <h3>Bespoke Baggy Jeans</h3>
+          <a href="{% url 'shop' %}?category=Jeans" class="mini-link">View Denim &rarr;</a>
+        </div>
+      </div>
+
+      <div class="mini-banner-card mini-card3">
+        <div class="mini-content">
+          <h4>GRAPHIC TEES</h4>
+          <h3>Kenzo &amp; Armani Polos</h3>
+          <a href="{% url 'shop' %}?category=T-Shirt" class="mini-link">Discover Tees &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
